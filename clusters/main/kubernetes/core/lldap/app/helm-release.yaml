@@ -1,0 +1,116 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: lldap
+  namespace: lldap
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: lldap
+      version: 7.3.1
+      sourceRef:
+        kind: HelmRepository
+        name: truecharts
+        namespace: flux-system
+      interval: 15m
+  timeout: 20m
+  maxHistory: 3
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    global:
+      stopAll: false
+    TZ: America/Los_Angeles
+    credentials:
+      s3:
+        type: s3
+        url: "${S3URL}"
+        bucket: "${S3PREFIX}"
+        accessKey: "${S3ID}"
+        secretKey: "${S3KEY}"
+        encrKey: "${S3KEY}"
+    service:
+      main:
+        enabled: true
+        loadBalancerIP: "${LLDAP_IP}"
+        ports:
+          main:
+            port: 17170
+        type: LoadBalancer
+      ldap:
+        enabled: true
+        ports:
+          ldap:
+            enabled: true
+            port: 3890
+    workload:
+      main:
+        podSpec:
+          containers:
+            main:
+              command:
+                - "/app/lldap"
+              args:
+                - "run"
+              env:
+                LLDAP_HTTP_PORT: "{{ .Values.service.main.ports.main.port }}"
+                LLDAP_LDAP_PORT: "{{ .Values.service.ldap.ports.ldap.port }}"
+                LLDAP_HTTP_URL: ${LLDAP_HTTP_URL}
+                LLDAP_LDAP_BASE_DN: ${LLDAP_LDAP_BASE_DN}
+                # ADMIN
+                LLDAP_LDAP_USER_DN: "admin"
+                LLDAP_LDAP_USER_EMAIL: ${EMAIL}
+                LLDAP_LDAP_USER_PASS: ${AUTH_PASS}
+                # LOGGING
+                LLDAP_VERBOSE: false
+                # SMTP
+                LLDAP_SMTP_OPTIONS__ENABLE_PASSWORD_RESET: false
+                LLDAP_SMTP_OPTIONS__SERVER: ""
+                LLDAP_SMTP_OPTIONS__PORT: 587
+                LLDAP_SMTP_OPTIONS__SMTP_ENCRYPTION: "STARTTLS"
+                LLDAP_SMTP_OPTIONS__USER: ""
+                LLDAP_SMTP_OPTIONS__PASSWORD: ""
+                LLDAP_SMTP_OPTIONS__FROM: "LLDAP Admin <sender@gmail.com>"
+                LLDAP_SMTP_OPTIONS__REPLY_TO: "Do not reply <noreply@localhost>"
+                LLDAP_JWT_SECRET:
+                  - secretRef:
+                      name: secrets
+                      key: LLDAP_JWT_SECRET
+                LLDAP_key_file: "/data/private_key"
+                LLDAP_database_url:
+                  secretKeyRef:
+                    name: cnpg-main-urls
+                    key: std
+    persistence:
+      data:
+        volsync:
+          - name: b2
+            type: restic
+            credentials: s3
+            dest:
+              enabled: true
+            src:
+              enabled: true
+    cnpg:
+      main:
+        # mode: recovery
+        backups:
+          enabled: true
+          credentials: s3
+        recovery:
+          method: object_store
+          credentials: s3
+    portal:
+      open:
+        enabled: true    
+    
