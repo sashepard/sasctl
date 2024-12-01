@@ -106,7 +106,7 @@ spec:
             middlewares:
               - name: local
                 namespace: traefik
-              - name: auth
+              #- name: auth
         hosts:
           - host: qbt.${DOMAIN_0}
             paths:
