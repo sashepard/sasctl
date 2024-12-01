@@ -4,4 +4,4 @@ resources:
   - kubernetes-dashboard/ks.yaml
   - plex/ks.yaml
   - qbt4kdown/ks.yaml
-  #- qbt4kseed/ks.yaml
+  - qbt4kseed/ks.yaml
