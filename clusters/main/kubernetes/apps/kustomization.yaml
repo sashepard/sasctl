@@ -6,7 +6,7 @@ resources:
   - qbt4kdown/ks.yaml
   - qbt4kseed/ks.yaml
   - vaultwarden/ks.yaml
-  #- scaleext/ks.yaml
-  #- opnsnsext/ks.yaml
-  #- proxext/ks.yaml
+  - scaleext/ks.yaml
+  - opnsnsext/ks.yaml
+  - proxext/ks.yaml
 
