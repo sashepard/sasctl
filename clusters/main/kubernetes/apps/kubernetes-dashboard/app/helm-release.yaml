@@ -49,12 +49,12 @@ spec:
                 namespace: traefik
               - name: auth
         hosts:
-          - host: qbt.${DOMAIN_0}
+          - host: kube.${DOMAIN_0}
             paths:
               - path: /
                 pathType: Prefix
         tls:
           - hosts:
-              - qbt.${DOMAIN_0}
+              - kube.${DOMAIN_0}
             clusterIssuer: domain-0-wildcard
         
