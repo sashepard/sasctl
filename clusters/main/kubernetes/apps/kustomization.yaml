@@ -9,4 +9,4 @@ resources:
   - scaleext/ks.yaml
   - opnsnsext/ks.yaml
   - proxext/ks.yaml
-
+  - qbttemp/ks.yaml
