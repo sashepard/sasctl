@@ -93,7 +93,7 @@ spec:
         type: nfs
       completed:
         enabled: true
-        path: /mnt/sas12/temp
+        path: /mnt/sas12st/temp
         mountPath: /opt
         server: 192.168.254.10
         type: nfs
